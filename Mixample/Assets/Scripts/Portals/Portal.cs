@@ -4,20 +4,19 @@ namespace Portal
 {
     public class Portal : MonoBehaviour
     {
-        [SerializeField] private Light _lightToTurnOn;
+        private Color _lightColor;
         [SerializeField] private LightChanger _lightChanger;
 
         private void Awake() => _lightChanger = FindObjectOfType<LightChanger>();
 
-        public void SetLightToTurnOn(Light light)
-        {
-            _lightToTurnOn = light;
-        }
+        public void SetLightColor(Color color) => _lightColor = color;
 
         private void OnTriggerEnter(Collider other)
         {
             if (other.TryGetComponent(out PlayerMover _))
-                _lightChanger.TurnOnLight(_lightToTurnOn);
+                TurnOnLightThroughPortal();
         }
+
+        public void TurnOnLightThroughPortal() => _lightChanger.TurnOnLight(_lightColor);
     }
 }

@@ -7,31 +7,17 @@ namespace Portal
     {
         [SerializeField] private float _portalDistance;
         [SerializeField] private Transform _portalParent;
-        [SerializeField] private GameObject _lightPrefab;
         [SerializeField] private GameObject _portalPrefab;
         [SerializeField] private LightChanger _lightChanger;
 
         private void Update()
         {
             if (Input.GetMouseButtonDown(0))
-            {
-                Light light = SpawnLight();
-                _lightChanger.AddLightToList(light);
-
+            { 
                 GameObject portalGameObject = SpawnPortal();
-                portalGameObject.GetComponentInChildren<Portal>().SetLightToTurnOn(light);
 
-                ChangeLightAndPortalToRandomColor(portalGameObject, light);
+                ChangeLightAndPortalToRandomColor(portalGameObject);
             }
-        }
-
-        private Light SpawnLight()
-        {
-            GameObject lightGameObject = Instantiate(_lightPrefab, _lightChanger.transform);
-            lightGameObject.transform.localPosition = Vector3.zero;
-            lightGameObject.SetActive(false);   
-
-            return lightGameObject.GetComponent<Light>();
         }
 
         private GameObject SpawnPortal()
@@ -42,15 +28,21 @@ namespace Portal
             return portalGameObject;
         }
 
-        private void ChangeLightAndPortalToRandomColor(GameObject portalGameObject, Light light)
+        private void ChangeLightAndPortalToRandomColor(GameObject portalGameObject)
         {
             Color randomColor = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-            light.color = randomColor;
+
+            portalGameObject.GetComponentInChildren<Portal>().SetLightColor(randomColor);
 
             List<MeshRenderer> meshRenderers = new List<MeshRenderer>(portalGameObject.GetComponentsInChildren<MeshRenderer>());
 
             foreach (MeshRenderer meshRenderer in meshRenderers)
+            {
+                if (meshRenderer.TryGetComponent(out LightSwitcher lightSwitcher))
+                    continue;
+
                 meshRenderer.material.SetColor("_EmissionColor", randomColor);
+            }
         }
     }
 }

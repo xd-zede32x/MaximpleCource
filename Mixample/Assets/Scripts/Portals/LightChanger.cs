@@ -1,38 +1,44 @@
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 
 namespace Portal
 {
     public class LightChanger : MonoBehaviour
     {
-        [SerializeField] private List<Light> _lights;
-        [SerializeField] private InitialLight _light = InitialLight.Blue;
+        [SerializeField] private Light _light;
         [SerializeField] private Material _lightbulbMaterial;
+        [SerializeField] private Color[] _initializeColors;
+        [SerializeField] private float _interpolationTime;
 
-        [SerializeField] private float _time;
+        public Light Light => _light;
 
-        private void Start()
+        public void TurnOnLight(Color color) => StartCoroutine(WaitToTurnLight(color));
+        public void ChangeLightColor(Color color) => _light.color = color;
+
+        private string TurnOnInitialLight(int index)
         {
-            for (int index = 0; index < _lights.Count; index++)
-                _lights[index].gameObject.SetActive(false);
+            _light.color = _initializeColors[index];
+            _lightbulbMaterial.SetColor("_EmissionColor", _initializeColors[index]);
 
-            _lightbulbMaterial.SetColor("_EmissionColor", _lights[1].color);
+            return "Light has been turned on";
         }
 
-        public void AddLightToList(Light light) => _lights.Add(light);
-
-        public void TurnOnLight(Light lightToTurnOn) => StartCoroutine(WaitToTurnLight(_time, lightToTurnOn));
-
-        private IEnumerator WaitToTurnLight(float time, Light light)
+        private IEnumerator WaitToTurnLight(Color color)
         {
-            yield return new WaitForSeconds(time);
+            float t = 0;
 
-            for (int index = 0; index < _lights.Count; index++)
-                _lights[index].gameObject.SetActive(false);
+            Color startColor = _light.color;
 
-            _lightbulbMaterial.SetColor("_EmissionColor", light.color);
-            light.gameObject.SetActive(true);
+            while (t < 1)
+            {
+                Color interpolatedColor = Color.Lerp(startColor, color, t);
+                _lightbulbMaterial.SetColor("_EmissionColor", interpolatedColor);
+                _light.color = interpolatedColor;
+                t += Time.deltaTime / _interpolationTime;
+
+                yield return null;
+            }
+
         }
     }
 }
