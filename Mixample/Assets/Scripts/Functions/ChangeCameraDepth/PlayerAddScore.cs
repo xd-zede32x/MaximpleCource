@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using SwitchCamera;
+using UnityEngine;
 using UnityEngine.UI;
 
-namespace Test
+namespace Score
 {
     [RequireComponent(typeof(Text))]
     [RequireComponent(typeof(ChangeText))]

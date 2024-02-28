@@ -12,6 +12,8 @@ namespace Player
         [SerializeField] private LayerMask _layerMaskDoor;
         [SerializeField] private LayerMask _layerMaskShelf;
 
+        private bool _isOpen = false;
+
         private void Update()
         {
             PlayerInputDoorAction();
@@ -20,49 +22,37 @@ namespace Player
 
         private void PlayerInputDoorAction()
         {
-            if (Input.GetKeyDown(KeyCode.F))
-                PerformDoorAction(true);
-
             if (Input.GetKeyDown(KeyCode.C))
-                PerformDoorAction(false);
+            {
+                if (!_isOpen)
+                    PerformDoorAction();
+            }
         }
 
         private void PlayerInputShelfAction()
         {
             if (Input.GetKeyDown(KeyCode.F))
-                PerformShelfAction(true);
-
-            if (Input.GetKeyDown(KeyCode.F))
-                PerformShelfAction(false);
+            {
+                if (_isOpen)
+                    PerformShelfAction();
+            }
         }
 
-        private void PerformDoorAction(bool isOpening)
+        private void PerformDoorAction()
         {
             if (Physics.Raycast(_mainCamera.transform.position, _mainCamera.transform.forward, out RaycastHit hit, _raycastMaxDistance, _layerMaskDoor))
             {
                 if (hit.collider.gameObject.TryGetComponent(out Door door))
-                {
-                    if (isOpening)
-                        door.DoorOpining();
-
-                    else
-                        door.DoorClosing();
-                }
+                    door?.OpenOrCLose();
             }
         }
 
-        private void PerformShelfAction(bool isOpening)
+        private void PerformShelfAction()
         {
             if (Physics.Raycast(_mainCamera.transform.position, _mainCamera.transform.forward, out RaycastHit hit, _raycastMaxDistance, _layerMaskShelf))
             {
                 if (hit.collider.gameObject.TryGetComponent(out Shelf shelf))
-                {
-                    if (!isOpening)
-                        shelf.ShelfOpining();
-
-                    else
-                        shelf.ShelfClosing();
-                }
+                    shelf?.OpenOrCLose();
             }
         }
     }

@@ -2,17 +2,37 @@ using UnityEngine;
 
 namespace Doors
 {
-    [RequireComponent(typeof(Animator))]
-    public class Door : MonoBehaviour
+    public class Door : MonoBehaviour, IOpenable
     {
-        private readonly int DoorOpen = Animator.StringToHash(nameof(DoorOpen));
-        private readonly int DoorLose = Animator.StringToHash(nameof(DoorLose));
+        [SerializeField] private float _openCloseTime;
+        [SerializeField] private float _rotateByDegrees = -90f;
 
-        private Animator _animator;
+        private Vector3 _startPosition;
+        private Vector3 _targetPosition;
 
-        private void Start() => _animator = GetComponent<Animator>();
+        private float _openToCloseLerp;
+        private bool _isOpened;
 
-        public void DoorOpining() => _animator.SetTrigger(DoorOpen);
-        public void DoorClosing() => _animator.SetTrigger(DoorLose);
+        private void Start()
+        {
+            _startPosition = transform.rotation.eulerAngles;
+            _targetPosition = transform.rotation.eulerAngles + Vector3.up * _rotateByDegrees;
+        }
+
+        private void Update() => DoorAction();
+
+        private void DoorAction()
+        {
+            transform.rotation = Quaternion.Lerp(Quaternion.Euler(_startPosition), Quaternion.Euler(_targetPosition), _openToCloseLerp);
+
+            _openToCloseLerp = _isOpened ?
+                Mathf.Clamp(_openToCloseLerp + Time.deltaTime / _openCloseTime, 0f, 1f)
+                : Mathf.Clamp(_openToCloseLerp - Time.deltaTime / _openCloseTime, 0f, 1f);
+        }
+
+        public void OpenOrCLose()
+        {
+            _isOpened = !_isOpened;
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Test
+namespace Score
 {
     [RequireComponent(typeof(PlayerAddScore))]
     public class ChangeText : MonoBehaviour

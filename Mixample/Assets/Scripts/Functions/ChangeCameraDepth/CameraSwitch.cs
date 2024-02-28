@@ -1,6 +1,7 @@
+using Score;
 using UnityEngine;
 
-namespace Test
+namespace SwitchCamera
 {
     [RequireComponent(typeof(Camera))]
     public class CameraSwitch : MonoBehaviour
